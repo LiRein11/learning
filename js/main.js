@@ -1,7 +1,7 @@
 window.addEventListener('DOMContentLoaded', () => {
 
   // Tabs 
-  
+
   const tabs = document.querySelectorAll('.tabheader__item'),
     tabsContent = document.querySelectorAll('.tabcontent'),
     tabsParent = document.querySelector('.tabheader__items');
@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     tabs.forEach(item => {
-      item.classList.remove('tabheader__item_active')
+      item.classList.remove('tabheader__item_active');
     });
   }
 
@@ -90,4 +90,54 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   setClock('.timer', deadline);
+
+  // Modal
+
+  const modalTrigger = document.querySelectorAll('[data-modal]'),
+    modal = document.querySelector('.modal'),
+    modalCloseBtn = document.querySelector('[data-close]');
+
+  function openModal() {
+    // modal.style.display = 'block';
+    modal.classList.toggle('modal__active');
+    document.body.style.overflow = 'hidden'; // Убираем скролл задней htmlки
+    clearInterval(modalTimerId); // Тут мы делаем, чтобы если пользователь сам октрыл модальное окно, ему потом не вылазило оно снова по истечению времени.
+  }
+
+  function closeModal() {
+    // modal.style.display = 'none';
+    modal.classList.toggle('modal__active');
+    document.body.style.overflow = '';
+  }
+
+  modalTrigger.forEach(el => {
+    el.addEventListener('click', openModal);
+  });
+
+  modalCloseBtn.addEventListener('click', closeModal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e) =>{
+    if(e.code === 'Escape' && modal.classList.contains('modal__active')){
+      closeModal();
+    }
+  }); // Навешиваем закрытие окна на эскейп и делаем так, чтобы эскейп срабатывал только при открытом модальном окне.
+
+  const modalTimerId = setTimeout(openModal, 10000);
+
+  function showModalByScroll() {
+    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+      openModal();
+      window.removeEventListener('scroll', showModalByScroll); // Таким образом мы удаляем событие при первом всплытии модального окна, чтобы оно больше не всплывало.
+    }
+  }
+
+  window.addEventListener('scroll', showModalByScroll); // Если число прокрученных пикселей и фактическая высота элемента, видимого пользователю больше или равно высоте контента, то есть если пользователь проскролил до самого конца, тогда появляется модальное окно.
 });
+
+
